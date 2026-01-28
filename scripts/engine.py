@@ -129,10 +129,13 @@ class SceneManager:
 class Sprite(pg.sprite.Sprite):
     def __init__(self, pos, size, color = None):
         super().__init__()
-        self.image = pg.Surface(size)
+        self.image = pg.Surface(size).convert_alpha()
+        self.size = Vector2(size)
         self.rect = Vector2(pos)
         if color:
             self.image.fill(color)
+        else:
+            self.image.fill(pg.Color(0, 0, 0, 0))
 
     def draw(self):
         screen.blit(self.image, self.pos)

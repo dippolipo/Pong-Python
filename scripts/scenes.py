@@ -14,7 +14,7 @@ class Level(engine.Scene):
         paddle_h = 40
         paddle_w = 10
         ball_r = 3
-        self.p1 = entities.Paddle(10, (10, (SCREENSIZE.y - paddle_h)/2), (paddle_w, paddle_h), pg.Color("white"))
+        self.p1 = entities.Paddle(5, (10, (SCREENSIZE.y - paddle_h)/2), (paddle_w, paddle_h), pg.Color("white"))
         self.p2 = entities.Paddle(64, (SCREENSIZE.x - 10 - paddle_w, (SCREENSIZE.y - paddle_h)/2), (paddle_w, paddle_h), pg.Color("white"))
         self.ball = entities.Ball(32, (SCREENSIZE.x/2 - ball_r, SCREENSIZE.y/2 - ball_r), ball_r, pg.Color("white"))
         self.entities = pg.sprite.Group(self.p1, self.p2, self.ball)
@@ -41,9 +41,26 @@ class Level(engine.Scene):
 
     def tick(self):
         self.get_keys()
+        self.entities.update()
+        self.ball_movement()
+        self.cpu_movement()
+
+    def cpu_movement(self):
+        self.p2.rect.y = self.ball.rect.y - (self.p2.size.y + self.ball.size.y) / 2
+
+    def ball_movement(self):
+        if self.ball.rect.x < globs.SCREENSIZE.x / 2:
+            top_right = Vector2(self.p1.rect.x + self.p1.size.x, self.p1.rect.y)
+            bottom_right = Vector2(self.p1.rect.x + self.p1.size.x, self.p1.rect.y + self.p1.size.y)
+            if engine.Collision.two_segment(self.ball.rect, self.ball.rect + self.ball.velocity, top_right, bottom_right):
+              self.ball.velocity.x *= -1
+        else:
+            bottom_left = Vector2(self.p2.rect.x, self.p2.rect.y + self.p2.size.y)
+            if engine.Collision.two_segment(self.ball.rect, self.ball.rect + self.ball.velocity, self.p2.rect, bottom_left):
+                self.ball.velocity.x *= -1
+        self.ball.rect += self.ball.velocity
 
     def draw(self):
         engine.screen.blit(self.background, (0, 0))
         self.entities.draw(engine.screen)
-        #self.p1.draw()
         self.get_events()
