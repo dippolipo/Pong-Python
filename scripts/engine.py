@@ -1,3 +1,4 @@
+from cmath import rect
 from operator import truediv
 
 import pygame
@@ -9,17 +10,10 @@ from pygame import Vector2
 from pygame.display import toggle_fullscreen
 
 clock = pg.time.Clock()
-screen = None
+screen = pg.Surface
 running = True
 
 class Scene:
-    stack_update = False
-    stack_append = []
-    stack_insert = []
-    stack_reset = None
-    stack_delete = None
-    stack_replace = []
-
     def __init__(self):
         self.visible = True
         self.active = True
@@ -130,6 +124,18 @@ class SceneManager:
     @staticmethod
     def set_main(scene):
         SceneManager.main_scene = scene
+
+
+class Sprite(pg.sprite.Sprite):
+    def __init__(self, pos, size, color = None):
+        super().__init__()
+        self.image = pg.Surface(size)
+        self.rect = Vector2(pos)
+        if color:
+            self.image.fill(color)
+
+    def draw(self):
+        screen.blit(self.image, self.pos)
 
 
 class Game:
@@ -351,6 +357,7 @@ class Tilemap:
                 final_canvas.blit(self.tiles_array[tile_id], (j * tile_size, i * tile_size))
 
         return final_canvas
+
 
 def pygame_init(name, icon, screen_size): # TODO
     global screen

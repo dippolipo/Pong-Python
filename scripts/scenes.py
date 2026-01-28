@@ -5,7 +5,45 @@ from scripts.engine import SceneManager as SM
 import pygame as pg
 from pygame import Vector2
 
-class Level:
+from scripts.globs import SCREENSIZE
+
+
+class Level(engine.Scene):
     def __init__(self):
         super().__init__()
+        paddle_h = 40
+        paddle_w = 10
+        ball_r = 3
+        self.p1 = entities.Paddle(10, (10, (SCREENSIZE.y - paddle_h)/2), (paddle_w, paddle_h), pg.Color("white"))
+        self.p2 = entities.Paddle(64, (SCREENSIZE.x - 10 - paddle_w, (SCREENSIZE.y - paddle_h)/2), (paddle_w, paddle_h), pg.Color("white"))
+        self.ball = entities.Ball(32, (SCREENSIZE.x/2 - ball_r, SCREENSIZE.y/2 - ball_r), ball_r, pg.Color("white"))
+        self.entities = pg.sprite.Group(self.p1, self.p2, self.ball)
+        # renderer
+        self.background = pg.Surface(globs.SCREENSIZE).convert_alpha()
+        self.background.fill("red")
+        s_n = 15
+        s_s = 5
+        s_h = (globs.SCREENSIZE.y - s_s * (s_n + 1)) / s_n
+        s_w = 4
+        for i in range(s_n):
+            pg.draw.rect(self.background, pg.Color("white"), pg.Rect((globs.SCREENSIZE.x - s_w) / 2, 0 + s_s + i * (s_h + s_s), s_w, s_h))
 
+    def get_keys(self):
+        keys = pg.key.get_pressed()
+        if keys[pg.K_ESCAPE]:
+            engine.running = False
+
+        if keys[pg.K_w]:
+            self.p1.move(-1)
+        if keys[pg.K_s]:
+            self.p1.move(1)
+
+
+    def tick(self):
+        self.get_keys()
+
+    def draw(self):
+        engine.screen.blit(self.background, (0, 0))
+        self.entities.draw(engine.screen)
+        #self.p1.draw()
+        self.get_events()
