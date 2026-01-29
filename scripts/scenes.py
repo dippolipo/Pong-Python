@@ -49,16 +49,14 @@ class Level(engine.Scene):
         self.p2.rect.y = self.ball.rect.y - (self.p2.size.y + self.ball.size.y) / 2
 
     def ball_movement(self):
+
         if self.ball.rect.x < globs.SCREENSIZE.x / 2:
-            top_right = Vector2(self.p1.rect.x + self.p1.size.x, self.p1.rect.y)
-            bottom_right = Vector2(self.p1.rect.x + self.p1.size.x, self.p1.rect.y + self.p1.size.y)
-            if engine.Collision.two_segment(self.ball.rect, self.ball.rect + self.ball.velocity, top_right, bottom_right):
+            if engine.Collision.two_segment(self.ball.rect.center, self.ball.rect.center + self.ball.velocity, self.p1.rect.topright, self.p1.rect.bottomright):
               self.ball.velocity.x *= -1
         else:
-            bottom_left = Vector2(self.p2.rect.x, self.p2.rect.y + self.p2.size.y)
-            if engine.Collision.two_segment(self.ball.rect, self.ball.rect + self.ball.velocity, self.p2.rect, bottom_left):
+            if engine.Collision.two_segment(self.ball.rect.center, self.ball.rect.center + self.ball.velocity, self.p2.rect.topleft, self.p2.rect.bottomleft):
                 self.ball.velocity.x *= -1
-        self.ball.rect += self.ball.velocity
+        self.ball.rect.center += self.ball.velocity
 
     def draw(self):
         engine.screen.blit(self.background, (0, 0))

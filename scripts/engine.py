@@ -1,6 +1,3 @@
-from cmath import rect
-from operator import truediv
-
 import pygame
 import pygame as pg
 import random
@@ -131,7 +128,7 @@ class Sprite(pg.sprite.Sprite):
         super().__init__()
         self.image = pg.Surface(size).convert_alpha()
         self.size = Vector2(size)
-        self.rect = Vector2(pos)
+        self.rect = pg.Rect(pos, size)
         if color:
             self.image.fill(color)
         else:
@@ -385,9 +382,18 @@ def load_tileset(tileset_image, tile_size):
     return single_tiles
 
 
+def convert_to_vector2(*objects):
+    to_return = []
+    for i in objects:
+        to_return.append(Vector2(i))
+        print(type(to_return[-1]), to_return[-1])
+    print("toreturn", to_return)
+    return to_return
+
 class Collision:
     @staticmethod
     def two_segment(a, b, c, d):
+        a, b, c, d = convert_to_vector2(a, b, c, d)
         def cfpm0(start, end1, end2):  # cross from points < 0
             return (end1.y - start.y) * (end2.x - start.x) - (end2.y - start.y) * (end1.x - start.x) < 0
 
@@ -398,6 +404,7 @@ class Collision:
 
     @staticmethod
     def two_segment_distance(a, b, c, d): # distance from A to CD segment
+        a, b, c, d = convert_to_vector2(a, b, c, d)
         vec = b - a
         if Collision.two_segment(a, b, c, d):
             seg = d - c
