@@ -36,16 +36,15 @@ class Ball(engine.Sprite):
         ray1 = engine.Collision.two_segment(v_ort + self.rect.center, v_ort + self.rect.center + self.velocity, a, b)
         v_ort *= -1
         ray2 = engine.Collision.two_segment(v_ort + self.rect.center, v_ort + self.rect.center + self.velocity, a, b)
-        if ray1 or ray2:
-            pass
+        if (not ray1) or  (not ray2):
+            self.rect.center += self.velocity
             #self.image.fill(pg.Color("green"))
-        self.rect.center += self.velocity
         # debug start
         engine.debug_screen.fill(pg.Color(0,0,0,0))
+        pg.draw.line(engine.debug_screen, pg.Color("green"), a, b)
         pg.draw.line(engine.debug_screen, pg.Color("red"), self.rect.center,self.rect.center)
         pg.draw.line(engine.debug_screen, pg.Color("black"), v_ort + self.rect.center, v_ort + self.rect.center + self.velocity)
         pg.draw.line(engine.debug_screen, pg.Color("black"), v_ort * -1  + self.rect.center, v_ort * -1 + self.rect.center + self.velocity)
-        pg.draw.rect(engine.debug_screen, pg.Color("green"), self.rect)
         # debug
         """if ray1.length() < ray2.length():
                 self.rect.center += ray1                

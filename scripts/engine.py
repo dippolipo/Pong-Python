@@ -397,10 +397,10 @@ class Collision:
     def two_segment(a, b, c, d):
         a, b, c, d = convert_to_vector2(a, b, c, d)
         def cfpm0(start, end1, end2):  # cross from points < 0
-            return (end1.y - start.y) * (end2.x - start.x) - (end2.y - start.y) * (end1.x - start.x)
+            return (end1.x - start.x) * (end2.y - start.y) - (end1.y - start.y) * (end2.x - start.x) <= 0
         # if cfpm0(a, c, d) != cfpm0(b, c, d) and cfpm0(c, a, b) != cfpm0(d, a, b):
         # if (cfpm0(a, c, d) != cfpm0(b, c, d) or cfpm0(a, c, d) == 0) and (cfpm0(c, a, b) != cfpm0(d, a, b) or cfpm0(c,a,b) == 0):
-        if cfpm0(a, c, d) * cfpm0(b, c, d) <= 0 and cfpm0(c, a, b) * cfpm0(d, a, b) <= 0:
+        if cfpm0(a, c, d) != cfpm0(b, c, d) and cfpm0(c, a, b) != cfpm0(d, a, b):
             return True
         else:
             return False
