@@ -11,6 +11,7 @@ from scripts.globs import SCREENSIZE
 class Level(engine.Scene):
     def __init__(self):
         super().__init__()
+        # entities
         paddle_h = 40
         paddle_w = 10
         ball_r = 3
@@ -27,6 +28,8 @@ class Level(engine.Scene):
         s_w = 4
         for i in range(s_n):
             pg.draw.rect(self.background, pg.Color("white"), pg.Rect((globs.SCREENSIZE.x - s_w) / 2, 0 + s_s + i * (s_h + s_s), s_w, s_h))
+        # debug
+        self.next_frame = False
 
     def get_keys(self):
         keys = pg.key.get_pressed()
@@ -37,28 +40,40 @@ class Level(engine.Scene):
             self.p1.move(-1)
         if keys[pg.K_s]:
             self.p1.move(1)
+        if keys[pg.K_q]:
+            self.next_frame = True
 
 
     def tick(self):
         self.get_keys()
+        self.get_events()
         self.entities.update()
-        self.ball_movement()
+        if self.next_frame:
+            self.ball_movement()
+            self.next_frame = False
         self.cpu_movement()
+
+    def key_down_events(self, key):
+        if key == pg.K_e:
+            self.next_frame = True
 
     def cpu_movement(self):
         self.p2.rect.y = self.ball.rect.y - (self.p2.size.y + self.ball.size.y) / 2
 
     def ball_movement(self):
 
-        if self.ball.rect.x < globs.SCREENSIZE.x / 2:
-            if engine.Collision.two_segment(self.ball.rect.center, self.ball.rect.center + self.ball.velocity, self.p1.rect.topright, self.p1.rect.bottomright):
-              self.ball.velocity.x *= -1
+        if self.ball.rect.x <= globs.SCREENSIZE.x / 2:
+            """if engine.Collision.two_segment(self.ball.rect.center, self.ball.rect.center + self.ball.velocity, self.p1.rect.topright, self.p1.rect.bottomright):
+              self.ball.velocity.x *= -1"""
+            self.ball.check_collision(self.p1.rect.topright, self.p1.rect.bottomright)
         else:
-            if engine.Collision.two_segment(self.ball.rect.center, self.ball.rect.center + self.ball.velocity, self.p2.rect.topleft, self.p2.rect.bottomleft):
-                self.ball.velocity.x *= -1
-        self.ball.rect.center += self.ball.velocity
+            """if engine.Collision.two_segment(self.ball.rect.center, self.ball.rect.center + self.ball.velocity, self.p2.rect.topleft, self.p2.rect.bottomleft):
+                self.ball.velocity.x *= -1"""
+            self.ball.check_collision(self.p2.rect.topleft, self.p2.rect.bottomleft)
+
+        # self.ball.rect.center += self.ball.velocity
 
     def draw(self):
         engine.screen.blit(self.background, (0, 0))
         self.entities.draw(engine.screen)
-        self.get_events()
+        engine.screen.blit(engine.debug_screen, (0,0))

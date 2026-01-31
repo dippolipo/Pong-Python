@@ -25,12 +25,29 @@ class Ball(engine.Sprite):
         pg.draw.circle(self.image, color, (radius, radius), radius)
         ran = 0 # random.randint(-10, 10)
         initial_degree = math.radians(ran)
-        print(ran)
+        self.radius = radius
         self.position = Vector2(384/2,216/2)
-        self.velocity = Vector2(math.cos(initial_degree) * random.choice((-1, 1)), math.sin(initial_degree)) * 150
-        print(self.velocity)
+        self.velocity = Vector2(math.cos(initial_degree) * random.choice((-1, 1)), math.sin(initial_degree))*2
 
-    def check_paddle_collision(self, a, b):
-        pass
-
-
+    def check_collision(self, a, b):
+        a, b = engine.convert_to_vector2(a, b)
+        normal = self.velocity.normalize()
+        v_ort = Vector2(normal.y * -1, normal.x) * self.radius
+        ray1 = engine.Collision.two_segment(v_ort + self.rect.center, v_ort + self.rect.center + self.velocity, a, b)
+        v_ort *= -1
+        ray2 = engine.Collision.two_segment(v_ort + self.rect.center, v_ort + self.rect.center + self.velocity, a, b)
+        if ray1 or ray2:
+            pass
+            #self.image.fill(pg.Color("green"))
+        self.rect.center += self.velocity
+        # debug start
+        engine.debug_screen.fill(pg.Color(0,0,0,0))
+        pg.draw.line(engine.debug_screen, pg.Color("red"), self.rect.center,self.rect.center)
+        pg.draw.line(engine.debug_screen, pg.Color("black"), v_ort + self.rect.center, v_ort + self.rect.center + self.velocity)
+        pg.draw.line(engine.debug_screen, pg.Color("black"), v_ort * -1  + self.rect.center, v_ort * -1 + self.rect.center + self.velocity)
+        pg.draw.rect(engine.debug_screen, pg.Color("green"), self.rect)
+        # debug
+        """if ray1.length() < ray2.length():
+                self.rect.center += ray1                
+            else:                                       
+                self.rect.center += ray2"""

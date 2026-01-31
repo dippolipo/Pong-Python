@@ -5,11 +5,12 @@ import copy
 
 from pygame import Vector2
 from pygame.display import toggle_fullscreen
+from pygame.surface import Surface
 
 clock = pg.time.Clock()
 screen = pg.Surface
 running = True
-
+debug_screen = pg.Surface
 class Scene:
     def __init__(self):
         self.visible = True
@@ -361,12 +362,15 @@ class Tilemap:
 
 def pygame_init(name, icon, screen_size): # TODO
     global screen
+    global debug_screen
     pg.init()
     if icon:
         pg.display.set_icon(pg.image.load(icon))
 
     pg.display.set_caption(name)
     screen = pg.display.set_mode(screen_size, pg.SCALED)
+    debug_screen = Surface(screen_size).convert_alpha()
+    debug_screen.fill(pg.Color(0, 0, 0, 0))
 
 
 def load_tileset(tileset_image, tile_size):
@@ -386,8 +390,6 @@ def convert_to_vector2(*objects):
     to_return = []
     for i in objects:
         to_return.append(Vector2(i))
-        print(type(to_return[-1]), to_return[-1])
-    print("toreturn", to_return)
     return to_return
 
 class Collision:
@@ -395,9 +397,10 @@ class Collision:
     def two_segment(a, b, c, d):
         a, b, c, d = convert_to_vector2(a, b, c, d)
         def cfpm0(start, end1, end2):  # cross from points < 0
-            return (end1.y - start.y) * (end2.x - start.x) - (end2.y - start.y) * (end1.x - start.x) < 0
-
-        if cfpm0(a, c, d) != cfpm0(b, c, d) and cfpm0(c, a, b) != cfpm0(d, a, b):
+            return (end1.y - start.y) * (end2.x - start.x) - (end2.y - start.y) * (end1.x - start.x)
+        # if cfpm0(a, c, d) != cfpm0(b, c, d) and cfpm0(c, a, b) != cfpm0(d, a, b):
+        # if (cfpm0(a, c, d) != cfpm0(b, c, d) or cfpm0(a, c, d) == 0) and (cfpm0(c, a, b) != cfpm0(d, a, b) or cfpm0(c,a,b) == 0):
+        if cfpm0(a, c, d) * cfpm0(b, c, d) <= 0 and cfpm0(c, a, b) * cfpm0(d, a, b) <= 0:
             return True
         else:
             return False
